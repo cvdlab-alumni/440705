@@ -23,6 +23,7 @@ plinti = COLOR([0.72,0.5,0.3])(STRUCT([plintx1,plintx2,plinty1,plinty2,plintiCop
 #VIEW(STRUCT([piattaforma,plinti]))
 
 c = CIRCUMFERENCE(0.5)(20)
+#c = SOLIDIFY(CIRCUMFERENCE(0.5)(20))
 
 colonnex1 = T([1,2])([1.64,1.64]) (STRUCT([c,T(1)(3.16833)]*13))
 colonnex2 = T([1,2])([1.64,17.2]) (STRUCT([c,T(1)(3.16833)]*13))
@@ -65,12 +66,13 @@ travey2 = T([1,2])([39.32,1.60833])(CUBOID([0.6,15.58]))
 traveEntrata = T([1,2])([6.62,4.72])(CUBOID([0.6,8.99]))
 traveUscita = T([1,2])([33.79,4.72])(CUBOID([0.6,8.99]))
 
-travi = COLOR([0.4,1,0.4])( SKELETON(1)(STRUCT([travex2,travex1,travey1,travey2,traveEntrata,traveUscita])) )
+#travi = COLOR([0.4,1,0.4])( SKELETON(1)(STRUCT([travex2,travex1,travey1,travey2,traveEntrata,traveUscita])) )
+travi = COLOR([0.4,1,0.4])( STRUCT([travex2,travex1,travey1,travey2,traveEntrata,traveUscita]) )
 
 VIEW(STRUCT([pareti,piattaforma,plinti,colonne,travi]))
 
-secondaTravey1 = T([1,2])([1.34,1.60833])(CUBOID([0.6,15.58]))
-secondaTravey2 = T([1,2])([39.32,1.60833])(CUBOID([0.6,15.58]))
+secondaTravey1 = T([1,2])([1.34,1.35833])(CUBOID([0.6,16.15]))
+secondaTravey2 = T([1,2])([39.32,1.35833])(CUBOID([0.6,16.15]))
 secondaTraveEntrata = COLOR(BLUE)(T([1,2])([6.62,4.72])(CUBOID([0.6,8.99])))
 secondaTraveUscita = T([1,2])([33.79,4.72])(CUBOID([0.6,8.99]))
 
@@ -79,10 +81,45 @@ secondeTravi = COLOR(BLUE)(STRUCT([secondaTravey1,secondaTravey2,secondaTraveEnt
 VIEW(STRUCT([pareti,piattaforma,plinti,colonne,travi,secondeTravi]))
 
 
-puntiTettoy1 = AA(MK)([[1.1,1.30833],[1.1,17.48833],[1.1,9.39833,3], [1.94,1.30833],[1.94,17.48833],[1.94,9.39833,3]])
+puntiTettoy1 = AA(MK)([[1.1,1.00833],[1.1,17.78833],[1.1,9.39833,3], [1.94,1.00833],[1.94,17.78833],[1.94,9.39833,3]])
 tettoy1 = COLOR(RED)(JOIN(puntiTettoy1))
 
-puntiTettoy2 = AA(MK)([[39.08,1.30833],[39.08,17.48833],[39.08,9.39833,3], [39.92,1.30833],[39.92,17.48833],[39.92,9.39833,3]])
+puntiTettoy2 = AA(MK)([[39.08,1.00833],[39.08,17.78833],[39.08,9.39833,3], [39.92,1.00833],[39.92,17.78833],[39.92,9.39833,3]])
 tettoy2 = COLOR(RED)(JOIN(puntiTettoy2))
 
-VIEW(STRUCT([tettoy1,tettoy2,travi]))
+VIEW(STRUCT([pareti,piattaforma,plinti,colonne,travi,secondeTravi,tettoy1,tettoy2]))
+
+base = SOLIDIFY(base)
+scalino1 = SOLIDIFY(PROD([scalino1,Q(0.8)]))
+scalino2 = SOLIDIFY(T(3)(0.8)(PROD([scalino2,Q(0.8)])))
+piattaforma = STRUCT([base,scalino1,scalino2])
+
+plinti = COLOR([0.72,0.5,0.3]) ( T(3)(1.6)(PROD([plinti,Q(0.8)])) )
+pareti = SOLIDIFY(pareti)
+pareti = COLOR([0.545,0.27,0])( T(3)(2.4)(PROD([pareti,Q(7)])) )
+colonne = COLOR([0.4,1,0.4])( T(3)(2.4)(PROD([colonne,Q(7)])) )
+travi = COLOR([1,1,0.4])( T(3)(9.4)(PROD([travi,Q(1.2)])) )
+secondeTravi = COLOR([1,0.98,0.803])( T(3)(10.6)(PROD([secondeTravi,Q(1.2)])) )
+tettoy1 = T(3)(11.8)(tettoy1)
+tettoy2 = T(3)(11.8)(tettoy2)
+
+VIEW(STRUCT([pareti,piattaforma,plinti,colonne,travi,secondeTravi,tettoy1,tettoy2]))
+
+
+def semicirc():
+    def sphere1(p): return [COS(p[0]), SIN(p[0])]
+    def domain(n): return INTERVALS(PI)(n)
+    return ( MAP(sphere1)(domain(32)) )
+
+s = T([1,2])([1,6])(semicirc())
+p = CUBOID([2,6])
+
+arco = PROD([JOIN([s,p]),Q(1)])
+arco = MAP([S3,S1,S2])(arco)
+arco = T([1,2,3])([30.5,8.22,2.4])(arco)
+
+pareti = COLOR([0.545,0.27,0])(DIFFERENCE([pareti,arco]))
+
+VIEW(STRUCT([pareti,piattaforma,plinti,colonne,travi,secondeTravi,tettoy1,tettoy2]))
+
+
