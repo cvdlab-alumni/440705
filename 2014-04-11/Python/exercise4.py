@@ -265,6 +265,25 @@ lampioncino = T([1,2])([55,25])(STRUCT([piolo,luce]))
 lampioncini = STRUCT([lampioncino,T(1)(9.5)]*5)
 
 
+asta1Semaforo = CYLINDER([0.1,3.5])(50)
+asta2Semaforo = T(3)(2.5)(CUBOID([0.4,0.1,1]))
+
+semaforo = COLOR(YELLOW)(STRUCT([asta1Semaforo,asta2Semaforo]))
+cerchioSemaforo = R([2,3])(PI/2)(CYLINDER([0.12,0.05])(50))
+cerchioSemaforo = T([1,2])([0.2,0.15]) (cerchioSemaforo)
+rosso = COLOR(RED)(T(3)(3.37) (cerchioSemaforo))
+arancione = COLOR([1,0.6,0])(T(3)(3) (cerchioSemaforo))
+verde = COLOR(GREEN)(T(3)(2.63) (cerchioSemaforo))
+
+
+semaforo = STRUCT([semaforo,rosso,arancione,verde])
+semaforo1 = T([1,2])([8,16])(semaforo)
+semaforo2 = T([1,2])([8,11])(R([1,2])(PI/2)(semaforo))
+semaforo3 = T([1,2])([13,11])(R([1,2])(PI)(semaforo))
+semaforo4 = T([1,2])([13,16])(R([1,2])(-PI/2)(semaforo))
+semafori = STRUCT([semaforo1,semaforo2,semaforo3,semaforo4])
+
+
 ponte = R([2,3])(PI/2)(semicirc(5))
 ponte = R([1,2])(-PI/2)(ponte)
 ponte = T([1,2])([97,27])(ponte)
@@ -273,6 +292,59 @@ ponte = DIFFERENCE([ponte,(T(3)(-0.1)(ponte))])
 ponte = COLOR([0.502,0.502,0.502]) (ponte)
 
 
-esterno = STRUCT([alberi,roccia,fiume,lago,panchine,lampioncini,lampioni,ponte])
+def daGradiARadianti(grado):
+	return (grado*PI/180)
+
+
+def piuRadianti(n):
+    rad = [0]
+    for i in range(1,n):
+        i = i*(360/n)
+        rad += [daGradiARadianti(i)]
+    return rad
+
+def ruotaSuCirconferenza(oggetto,quantiPunti):
+	oggetti = [oggetto]
+	radianti = piuRadianti(quantiPunti)
+	for i in range(quantiPunti):
+		rad = radianti[i]
+		u = R([1,2])(rad)(oggetto)
+		oggetti += [u]
+	return oggetti
+
+def quartocirc(r):
+    def sphere1(p): return [r*COS(p[0]), r*SIN(p[0])]
+    def domain(n): return INTERVALS(PI/2)(n)
+    return ( MAP(sphere1)(domain(32)) )
+
+q = COLOR(GREEN)( T(2)(-1)(R([1,3])(-3*PI/2)(quartocirc(1))))
+erba0 = ruotaSuCirconferenza(q,36)
+erba0 = S([1,2,3])([0.1,0.1,0.1])(STRUCT(erba0))
+erba1 = T([1,2,3])([47.5,50,7])(STRUCT([erba0,T(2)(0.5)]*30))
+erba2 = T([1,2,3])([49.5,50,7])(STRUCT([erba0,T(2)(0.5)]*30))
+erba = STRUCT([erba1,erba2])
+
+girasole = COLOR(YELLOW)( T(2)(-2)(R([1,3])(-3*PI/2)(quartocirc(1))))
+girasole = STRUCT(ruotaSuCirconferenza(girasole,72))
+cerchio = JOIN(AA(MK)(CIRCLE_POINTS(1,50)))
+cerchio = COLOR([0.325,0.106,0])(cerchio)
+girasole = S([1,2,3])([0.1,0.1,0.1])(STRUCT([girasole,cerchio]))
+
+stelo = CYLINDER([0.01,0.4])(50)
+foglia = CYLINDER([0.01,0.1])(50)
+foglia = R([1,3])(PI/6)(foglia)
+foglia = T(3)(0.3)(foglia)
+gambo = COLOR([0.482,0.627,0.357])(STRUCT([stelo,foglia]))
+girasoleCompl = STRUCT([gambo,(T(3)(0.4)(girasole))])
+girasoleCompl = T([1,2])([47,49])(STRUCT([girasoleCompl,T(2)(-0.5)]*5))
+girasoleCompl = STRUCT([girasoleCompl,T(1)(-0.5)]*8)
+
+prato = STRUCT([girasoleCompl,erba])
+
+esterno = STRUCT([alberi,roccia,fiume,lago,panchine,lampioncini,lampioni,ponte,semafori])
 
 VIEW(STRUCT([citta,esterno]))
+
+#esterno = STRUCT([alberi,roccia,fiume,lago,panchine,lampioncini,lampioni,ponte,semafori,prato])
+
+#VIEW(STRUCT([citta,esterno]))
