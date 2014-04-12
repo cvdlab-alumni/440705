@@ -320,13 +320,17 @@ def quartocirc(r):
 q = COLOR(GREEN)( T(2)(-1)(R([1,3])(-3*PI/2)(quartocirc(1))))
 erba0 = ruotaSuCirconferenza(q,36)
 erba0 = S([1,2,3])([0.1,0.1,0.1])(STRUCT(erba0))
+
+'''
 erba1 = T([1,2,3])([47.5,50,7])(STRUCT([erba0,T(2)(0.5)]*30))
 erba2 = T([1,2,3])([49.5,50,7])(STRUCT([erba0,T(2)(0.5)]*30))
 erba = STRUCT([erba1,erba2])
+'''
 
 girasole = COLOR(YELLOW)( T(2)(-2)(R([1,3])(-3*PI/2)(quartocirc(1))))
 girasole = STRUCT(ruotaSuCirconferenza(girasole,72))
 cerchio = JOIN(AA(MK)(CIRCLE_POINTS(1,50)))
+cerchio = CYLINDER([1,0.05])(36)
 cerchio = COLOR([0.325,0.106,0])(cerchio)
 girasole = S([1,2,3])([0.1,0.1,0.1])(STRUCT([girasole,cerchio]))
 
@@ -336,13 +340,32 @@ foglia = R([1,3])(PI/6)(foglia)
 foglia = T(3)(0.3)(foglia)
 gambo = COLOR([0.482,0.627,0.357])(STRUCT([stelo,foglia]))
 girasoleCompl = STRUCT([gambo,(T(3)(0.4)(girasole))])
-girasoleCompl = T([1,2])([47,49])(STRUCT([girasoleCompl,T(2)(-0.5)]*5))
-girasoleCompl = STRUCT([girasoleCompl,T(1)(-0.5)]*8)
 
-prato = STRUCT([girasoleCompl,erba])
+'''
+girasoli = T([1,2])([47,49])(STRUCT([girasoleCompl,T(2)(-0.5)]*5))
+girasoli = STRUCT([girasoli,T(1)(-0.5)]*8)
+prato = STRUCT([girasoli,erba])
+'''
 
-esterno = STRUCT([alberi,roccia,fiume,lago,panchine,lampioncini,lampioni,ponte,semafori])
+vasoBasso = T([1,2])([0.05,0.05])(CUBOID([0.5,0.2]))
+vasoAlto = T(3)(0.3)(CUBOID([0.6,0.3]))
+vaso = JOIN([vasoAlto,vasoBasso])
 
+terra = COLOR([0.6,0.2,0.08])( T([1,2,3])([0.025,0.025,0.3])(CUBOID([0.55,0.25,0.001])) )
+vaso = S([1,2,3])([2,2,2]) (STRUCT([vaso,terra]))
+giras1 = T([1,2,3])([0.3,0.35,0.6])(girasoleCompl)
+giras2 = T([1,2])([0.70,-0.2,0.6])(giras1)
+
+vaso = T([1,2])([64,-10]) (STRUCT([vaso,giras1,giras2]))
+vasi = STRUCT([vaso,T(1)(5.7)]*3)
+
+prato = T([1,2])([66,-9.5]) (STRUCT([erba0,T(1)(0.5)]*7))
+prato = STRUCT([prato,STRUCT([prato,T(1)(5.5)]*2)])
+
+giardino = STRUCT([prato,vasi])
+
+
+esterno = STRUCT([alberi,roccia,fiume,lago,panchine,lampioncini,lampioni,ponte,semafori,giardino])
 VIEW(STRUCT([citta,esterno]))
 
 #esterno = STRUCT([alberi,roccia,fiume,lago,panchine,lampioncini,lampioni,ponte,semafori,prato])
