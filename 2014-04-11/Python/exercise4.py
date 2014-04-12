@@ -1,5 +1,6 @@
 from pyplasm import *
 
+
 base = CUBOID([41.3,18.86])
 scalino1 = T([1,2])([0.57,0.57])(CUBOID([40.16,17.72]))
 scalino2 = T([1,2])([1.14,1.14])(CUBOID([39.02,16.58]))
@@ -82,12 +83,12 @@ scalino1 = PROD([scalino1,Q(0.8)])
 scalino2 = T(3)(0.8)(PROD([scalino2,Q(0.8)]))
 piattaforma = COLOR([1,0.8,0]) (STRUCT([base,scalino1,scalino2]) )
 
-def semicirc():
-    def sphere1(p): return [COS(p[0]), SIN(p[0])]
+def semicirc(r):
+    def sphere1(p): return [r*COS(p[0]), r*SIN(p[0])]
     def domain(n): return INTERVALS(PI)(n)
     return ( MAP(sphere1)(domain(32)) )
 
-s = T([1,2])([1,6])(semicirc())
+s = T([1,2])([1,6])(semicirc(1))
 p = CUBOID([2,6])
 
 arco = PROD([JOIN([s,p]),Q(1)])
@@ -107,7 +108,7 @@ tetti = COLOR([0.545,0.27,0])(STRUCT([tettoy1,tettoy2]))
 
 tempio_Agrigento = STRUCT([pareti,piattaforma,plinti,colonne,travi,secondeTravi,tetti])
 
-tempio_Agrigento = T([1,2])([65,35])(tempio_Agrigento)
+tempio_Agrigento = T([1,2])([75,55])(tempio_Agrigento)
 
 
 
@@ -161,8 +162,10 @@ palazzo2 = T([1,2])([3,29])(palazzo2)
 stradaOriz = T(2)(12)(CUBOID([97,3]))
 stradaVert = T(1)(9)(CUBOID([3,60])) 
 stradaOriz2 = T([1,2])([97,12])(CUBOID([3,10]))
+stradaOriz3 = T([1,2])([97,32])(CUBOID([3,10]))
 
-strade = COLOR([0.502,0.502,0.502]) (STRUCT([stradaOriz,stradaOriz2,stradaVert]))
+strade = COLOR([0.502,0.502,0.502]) (STRUCT([stradaOriz,stradaOriz2,stradaOriz3,stradaVert]))
+
 
 
 chiesaFaccia1 = CUBOID([7,0,10])
@@ -176,7 +179,6 @@ tetto = COLOR(RED)(JOIN([tetto2,tetto1]))
 
 cerchio = R([2,3])(PI/2)(CIRCLE(1)([64,1]))
 cerchio = COLOR(BLUE)(T([1,3])([3.5,8])(cerchio))
-
 
 portone = COLOR([0.6,0.2,0])( T(1)(2)(CUBOID([3,0,5])))
 
@@ -192,7 +194,85 @@ chiesa = T(1)(60)(chiesa)
 
 
 citta = STRUCT([palazzo1,palazzo2,palazzo3,palazzo4,strade,chiesa,tempio_Agrigento])
-VIEW(citta)
 
 
 
+
+tronco1 = COLOR([0.396,0.263,0.129])(CYLINDER([0.4,3])(50))
+foglie1 = COLOR([0.33,0.408,0.196])(T(3)(2.9)(SPHERE(1)([60,60])))
+
+albero1 = T([1,2])([55,60])(STRUCT([tronco1,foglie1]))
+alberiSchiera1 = STRUCT([albero1,T(1)(2.5)]*5)
+alberiSchiera1 = STRUCT([alberiSchiera1,T(2)(-4.5)]*7)
+
+tronco2 = COLOR([0.396,0.263,0.129])(CYLINDER([0.2,2])(50))
+cerchio = T(3)(1.9)(JOIN( AA(MK)(CIRCLE_POINTS(1,36)) ))
+punto = T(3)(5)(MK([0,0,0.8]))
+foglie2 = COLOR([0.4,1,0])(JOIN([cerchio,punto]))
+
+albero2 = T([1,2])([51,29])(STRUCT([tronco2,foglie2]))
+alberiSchiera21 = STRUCT([albero2,T(2)(4)]*5)
+alberiSchiera22 = STRUCT([albero2,T(1)(3.5)]*13)
+
+alberi = STRUCT([alberiSchiera1,alberiSchiera21,alberiSchiera22])
+
+roccia = COLOR([0.309,0.309,0.309])( T([1,2])([45,50])(CUBOID([7,15,7])) )
+
+fiume = T([1,2,3])([47.5,50,7])(CUBOID([2,15,0])) 
+cascata = T([1,2])([47.5,50])(CUBOID([2,0,7])) 
+fiume2 = T([1,2])([47.5,26])(CUBOID([2,24,0])) 
+fiume3 = T([1,2])([49,26])(CUBOID([54,2,0])) 
+
+fiume = COLOR([0,0.5,1])( STRUCT([fiume,cascata,fiume2,fiume3]) )
+
+c = AA(MK)(CIRCLE_POINTS(15,50))
+lago = COLOR([0,0.5,1])( T([1,2])([118,28])(JOIN(c)) )
+
+
+piede1Panchina = T([1,2])([1,1])(CUBOID([2,4,3]))
+piede2Panchina = T([1,2])([9,1])(CUBOID([2,4,3]))
+basePanchina = T(3)(3)(CUBOID([12,6,1]))
+schienalePanchina = R([2,3])(-PI/7)(CUBOID([12,1,5]))
+schienalePanchina = T([2,3])([5,4])(schienalePanchina)
+
+panchina = COLOR([0.8,0.8,0.8])(STRUCT([piede1Panchina,piede2Panchina,basePanchina,schienalePanchina]))
+panchina = S([1,2,3])([0.15,0.15,0.15])(panchina)
+panchina = R([1,2])(PI)(panchina)
+panchina = T([1,2])([53,25])(panchina)
+
+panchine = STRUCT([panchina,T(1)(9.5)]*5)
+
+
+asta = CYLINDER([0.1,4])(50)
+astaObl = CYLINDER([0.1,1])(50)
+astaObl = R([1,3])(PI/6)(astaObl)
+astaObl = T(3)(3.7)(astaObl)
+pezzoLuce = T([1,2,3])([-1.1,-0.1,4.4])(CUBOID([0.7,0.2,0.2]))
+lampadina = COLOR(YELLOW)( T([1,2,3])([-1.05,-0.07,4.39])(CUBOID([0.5,0.15,0.01])) )
+
+lampione = COLOR([0.8,0.8,1])(STRUCT([asta,astaObl,pezzoLuce,lampadina]))
+lampioniD = T([1,2])([13,22])( STRUCT([lampione,T(2)(6.5)]*6))
+
+lampione = R([1,2])(PI)(lampione)
+lampioniS = T([1,2])([7.5,22])( STRUCT([lampione,T(2)(6.5)]*6))
+
+lampioni = STRUCT([lampioniD,lampioniS])
+
+
+piolo = COLOR([0.3,0.3,0.3])(CYLINDER([0.1,1.1])(50))
+luce = COLOR([1,0.85,0])(T(3)(1)(SPHERE(0.25)([60,60])))
+lampioncino = T([1,2])([55,25])(STRUCT([piolo,luce]))
+lampioncini = STRUCT([lampioncino,T(1)(9.5)]*5)
+
+
+ponte = R([2,3])(PI/2)(semicirc(5))
+ponte = R([1,2])(-PI/2)(ponte)
+ponte = T([1,2])([97,27])(ponte)
+ponte = JOIN([ponte,(T(1)(3)(ponte))])
+ponte = DIFFERENCE([ponte,(T(3)(-0.1)(ponte))])
+ponte = COLOR([0.502,0.502,0.502]) (ponte)
+
+
+esterno = STRUCT([alberi,roccia,fiume,lago,panchine,lampioncini,lampioni,ponte])
+
+VIEW(STRUCT([citta,esterno]))
