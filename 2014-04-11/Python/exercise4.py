@@ -174,20 +174,20 @@ tetto1 = STRUCT( AA(MK)([[3.5,0,15],[0,0,10],[7,0,10]]) )
 chiesaFaccia2 = CUBOID([7,20,10])
 tetto2 = STRUCT( AA(MK)([[3.5,20,15],[0,20,10],[7,20,10]]) )
 
-base = JOIN([chiesaFaccia1,chiesaFaccia2])
-tetto = COLOR(RED)(JOIN([tetto2,tetto1]))
+base = COLOR([0.545,0.27,0])(JOIN([chiesaFaccia1,chiesaFaccia2]))
+tetto = COLOR([0.72,0.5,0.3])(JOIN([tetto2,tetto1]))
 
 cerchio = R([2,3])(PI/2)(CIRCLE(1)([64,1]))
-cerchio = COLOR(BLUE)(T([1,3])([3.5,8])(cerchio))
+cerchio = T([1,3])([3.5,8])(cerchio)
 
 portone = COLOR([0.6,0.2,0])( T(1)(2)(CUBOID([3,0,5])))
 
 finetraGrande1 =  T([2,3])([3,2]) (STRUCT([CUBOID([0,3,6]),T(2)(6)]*3))
 finetraGrande2 =  T(1)(7) (finetraGrande1)
-finestraRetro = COLOR([0,0,1])(T([1,2,3])([2.5,20,7])(CUBOID([2,0,2])))
-finestreChiesa = STRUCT([finetraGrande1,finetraGrande2,finestraRetro])
+finestraRetro = T([1,2,3])([2.5,20,7])(CUBOID([2,0,2]))
+finestreChiesa = COLOR([0.855,0.741,0.67]) (STRUCT([finetraGrande1,finetraGrande2,finestraRetro,cerchio]))
 
-chiesa = STRUCT([base,tetto,cerchio,portone,finestreChiesa])
+chiesa = STRUCT([base,tetto,portone,finestreChiesa])
 chiesa = R([1,2])(-PI/2)(chiesa)
 chiesa = T(1)(60)(chiesa)
 
