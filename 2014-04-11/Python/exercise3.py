@@ -106,4 +106,91 @@ tettoy2 = T(3)(11.8)(tettoy2)
 tetti = COLOR([0.545,0.27,0])(STRUCT([tettoy1,tettoy2]))
 
 tempio_Agrigento = STRUCT([pareti,piattaforma,plinti,colonne,travi,secondeTravi,tetti])
-VIEW(tempio_Agrigento)
+
+tempio_Agrigento = T([1,2])([65,35])(tempio_Agrigento)
+
+
+
+
+palazzo_piccolo = COLOR([0.8,0.5,0.2])(CUBOID([5,8,12]))
+
+finestra1 = COLOR([0,0,1])(CUBOID([0,1.5,1.5]))
+finestre_destra = T([2,3])([1,4])( STRUCT([finestra1,T(3)(2.5)]*3) )
+finestre_sinistra = T(2)(4.5)(finestre_destra)
+finestre_davanti = STRUCT([finestre_sinistra,finestre_destra])
+finestre_dietro = T(1)(5)(finestre_davanti)
+
+finestra2 = COLOR([0,0,1])(CUBOID([1.5,0,1.5]))
+finestre2_destra = T([1,3])([0.5,4])( STRUCT([finestra2,T(3)(2.5)]*3) )
+finestre2_sinistra = T(1)(2.5)(finestre2_destra)
+finestre2_davanti = STRUCT([finestre2_sinistra,finestre2_destra])
+finestre2_dietro = T(2)(8)(finestre2_davanti)
+
+finestre = STRUCT([finestre_davanti,finestre_dietro,finestre2_davanti,finestre2_dietro])
+
+porta = T(2)(3) ( COLOR([0.6,0.2,0])( CUBOID([0,2,3])) )
+
+palazzo1 = STRUCT([palazzo_piccolo,finestre,porta])
+
+
+palazzo_grande = COLOR([0.8,0.5,0.2])(CUBOID([3,8,18]))
+
+finestreP2_destra = T([2,3])([1,4])( STRUCT([finestra1,T(3)(2.5)]*5) )
+finestreP2_sinistra = T(2)(4.5)(finestreP2_destra)
+finestreP2_davanti = STRUCT([finestreP2_sinistra,finestreP2_destra])
+finestreP2_dietro = T(1)(3)(finestreP2_davanti)
+
+finestre2P2_davanti = T([1,3])([0.75,4])( STRUCT([finestra2,T(3)(2.5)]*5) )
+finestre2P2_dietro = T(2)(8)(finestre2P2_davanti)
+
+finestreP2 = STRUCT([finestreP2_davanti,finestreP2_dietro,finestre2P2_davanti,finestre2P2_dietro])
+
+palazzo2 = STRUCT([palazzo_grande,finestreP2,porta])
+
+
+palazzo3 = T([1,2])([15,21])(palazzo1)
+palazzo4 = T(1)(15)(palazzo2)
+
+palazzo1 = R([1,2])(PI)(palazzo1)
+palazzo1 = T([1,2])([5,8])(palazzo1)
+
+palazzo2 = R([1,2])(PI)(palazzo2)
+palazzo2 = T([1,2])([3,29])(palazzo2)
+
+
+strada1 = COLOR([0.502,0.502,0.502])( T(2)(12)(CUBOID([90,3])) )
+strada2 = COLOR([0.502,0.502,0.502])( T(1)(9)(CUBOID([3,60])) )
+
+
+
+chiesaFaccia1 = CUBOID([7,0,10])
+tetto1 = STRUCT( AA(MK)([[3.5,0,15],[0,0,10],[7,0,10]]) )
+
+chiesaFaccia2 = CUBOID([7,20,10])
+tetto2 = STRUCT( AA(MK)([[3.5,20,15],[0,20,10],[7,20,10]]) )
+
+base = JOIN([chiesaFaccia1,chiesaFaccia2])
+tetto = COLOR(RED)(JOIN([tetto2,tetto1]))
+
+cerchio = R([2,3])(PI/2)(CIRCLE(1)([64,1]))
+cerchio = COLOR(BLUE)(T([1,3])([3.5,8])(cerchio))
+
+portone = ( CUBOID([3,0,5]))
+portone = COLOR([0.6,0.2,0])( T(1)(2)(portone))
+
+finetraGrande1 =  T([2,3])([3,2]) (STRUCT([CUBOID([0,3,6]),T(2)(6)]*3))
+finetraGrande2 =  T(1)(7) (finetraGrande1)
+finestraRetro = COLOR([0,0,1])(T([1,2,3])([2.5,20,7])(CUBOID([2,0,2])))
+finestreChiesa = STRUCT([finetraGrande1,finetraGrande2,finestraRetro])
+
+chiesa = STRUCT([base,tetto,cerchio,portone,finestreChiesa])
+chiesa = R([1,2])(-PI/2)(chiesa)
+chiesa = T(1)(60)(chiesa)
+
+
+
+citta = STRUCT([palazzo1,palazzo2,palazzo3,palazzo4,strada1,strada2,chiesa,tempio_Agrigento])
+VIEW(citta)
+
+
+
