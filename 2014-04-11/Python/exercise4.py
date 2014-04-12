@@ -211,19 +211,15 @@ punto = T(3)(5)(MK([0,0,0.8]))
 foglie2 = COLOR([0.4,1,0])(JOIN([cerchio,punto]))
 
 albero2 = T([1,2])([51,29])(STRUCT([tronco2,foglie2]))
-alberiSchiera21 = STRUCT([albero2,T(2)(4)]*5)
+alberiSchiera21 = STRUCT([albero2,T(2)(4)]*9)
 alberiSchiera22 = STRUCT([albero2,T(1)(3.5)]*13)
 
 alberi = STRUCT([alberiSchiera1,alberiSchiera21,alberiSchiera22])
 
-roccia = COLOR([0.309,0.309,0.309])( T([1,2])([45,50])(CUBOID([7,15,7])) )
+fiume1 = T([1,2])([47.5,26])(CUBOID([2,39,0])) 
+fiume2 = T([1,2])([49,26])(CUBOID([54,2,0])) 
 
-fiume = T([1,2,3])([47.5,50,7])(CUBOID([2,15,0])) 
-cascata = T([1,2])([47.5,50])(CUBOID([2,0,7])) 
-fiume2 = T([1,2])([47.5,26])(CUBOID([2,24,0])) 
-fiume3 = T([1,2])([49,26])(CUBOID([54,2,0])) 
-
-fiume = COLOR([0,0.5,1])( STRUCT([fiume,cascata,fiume2,fiume3]) )
+fiume = COLOR([0,0.5,1])( STRUCT([fiume1,fiume2]) )
 
 c = AA(MK)(CIRCLE_POINTS(15,50))
 lago = COLOR([0,0.5,1])( T([1,2])([118,28])(JOIN(c)) )
@@ -365,7 +361,7 @@ prato = STRUCT([prato,STRUCT([prato,T(1)(5.5)]*2)])
 giardino = STRUCT([prato,vasi])
 
 
-esterno = STRUCT([alberi,roccia,fiume,lago,panchine,lampioncini,lampioni,ponte,semafori,giardino])
+esterno = STRUCT([alberi,fiume,lago,panchine,lampioncini,lampioni,ponte,semafori,giardino])
 VIEW(STRUCT([citta,esterno]))
 
 #esterno = STRUCT([alberi,roccia,fiume,lago,panchine,lampioncini,lampioni,ponte,semafori,prato])
