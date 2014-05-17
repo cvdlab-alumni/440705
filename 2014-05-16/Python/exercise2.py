@@ -122,20 +122,13 @@ tavolo = COLOR([0.8,0.5,0.2])(T([1,2])([4,5]) (CUBOID([2,.5,1])))
 
 controls1a = [[.5,4,0],[0,1.8,0],[2,1,0],[4,.5,0],[7,1.8,0],[7.5,3,0],[7,4,0]]
 bezier1a = BEZIER(S1)(controls1a)
-#VIEW(bezier1a)
-
 controls1b = [[.5,4,1],[0,1.8,1],[2,1,1],[4,.5,1],[7,1.8,1],[7.5,3,1],[7,4,1]]
 bezier1b = BEZIER(S1)(controls1b)
-#VIEW(bezier1b)
-
 
 controls2a = [[.5,4,0],[1.5,2,0],[2,2.5,0],[4,2,0],[6,2.5,0],[6.2,3.2,0],[7,4,0]]
 bezier2a = BEZIER(S1)(controls2a)
-#VIEW(bezier2a)
-
 controls2b = [[.5,4,1],[1.5,2,1],[2,2.5,1],[4,2,1],[6,2.5,1],[6.2,3.2,1],[7,4,1]]
 bezier2b = BEZIER(S1)(controls2b)
-#VIEW(bezier2b)
 
 
 bezier1 = MAP( BEZIER(S2)([bezier1a,bezier1b]))(dom2D)
@@ -166,12 +159,31 @@ bezier4 = MAP( BEZIER(S2)([bezier1b,bezier2b]))(dom2D)
 
 curve2 = T([1,2])([10,1]) (STRUCT([bezier1,bezier2,bezier3,bezier4]))
 VIEW(curve2)
-VIEW(STRUCT([tavolo,curve,curve2,hpc]))
+
+
+controls1a = [[5,0,0],[1,1.5,0],[9,3,0],[1,4.5,0],[5,6,0]]
+bezier1a = BEZIER(S1)(controls1a)
+controls1b = [[5,0,2],[1,1.5,2],[9,3,2],[1,4.5,2],[5,6,2]]
+bezier1b = BEZIER(S1)(controls1b)
+
+controls2a = [[5,0,0],[9,1.5,0],[1,3,0],[9,4.5,0],[5,6,0]]
+bezier2a = BEZIER(S1)(controls2a)
+controls2b = [[5,0,2],[9,1.5,2],[1,3,2],[9,4.5,2],[5,6,2]]
+bezier2b = BEZIER(S1)(controls2b)
+
+bezier1 = MAP( BEZIER(S2)([bezier1a,bezier1b]))(dom2D)
+bezier2 = MAP( BEZIER(S2)([bezier2a,bezier2b]))(dom2D)
+bezier3 = MAP( BEZIER(S2)([bezier1a,bezier2a]))(dom2D)
+bezier4 = MAP( BEZIER(S2)([bezier1b,bezier2b]))(dom2D)
+
+curve3 = COLOR([0.5,1,0])( T([1,2])([24,7]) (STRUCT([bezier1,bezier2,bezier3,bezier4])))
+VIEW(STRUCT([curve3]))
+VIEW(STRUCT([tavolo,curve,curve2,curve3,hpc]))
+
 
 toRemoveParete = [2,0]
 palazzo = palazzo[0], [cell for k,cell in enumerate(palazzo[1]) if not (k in toRemoveParete)]
 
-
 pal = COLOR([0.545,0.27,0])(STRUCT(MKPOLS(palazzo)))
-VIEW(STRUCT([tavolo,curve,curve2,pal]))
+VIEW(STRUCT([tavolo,curve,curve2,curve3,pal]))
 
