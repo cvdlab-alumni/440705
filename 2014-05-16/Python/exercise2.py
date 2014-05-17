@@ -6,8 +6,6 @@ DRAW = COMP([VIEW,STRUCT,MKPOLS])
 master = assemblyDiagramInit([11,9,2])([[.3,4,.1,4.5,.1,3,.1,5,.1,4,.3],
                                         [.3,1.5,.1,0.5,.1,2,0.1,3,.3],[.3,2.7]])
 V,CV = master
-hpc = SKEL_1(STRUCT(MKPOLS(master)))
-hpc = cellNumbering (master,hpc)(range(len(CV)),CYAN,2)
 
 toRemoveTetto = [21,29,33,57,65,69,93,101,105,129,137,141,165,173,177]
 master = master[0], [cell for k,cell in enumerate(master[1]) if not (k in toRemoveTetto)]
@@ -18,9 +16,6 @@ master = master[0], [cell for k,cell in enumerate(master[1]) if not (k in toRemo
 toRemoveMuriVert = [33,35,37,62,92,126,128,130,134]
 master = master[0], [cell for k,cell in enumerate(master[1]) if not (k in toRemoveMuriVert)]
 
-hpc = SKEL_1(STRUCT(MKPOLS(master)))
-hpc = cellNumbering (master,hpc)(range(len(master[1])),CYAN,2)
-#VIEW(hpc)
 
 master = mne(master,[3,1,2],[[1.5,1,1.5],[.3],[2,.7]],132) #per fare porta
 master = mne(master,[4,1,3],[[3,.9,.2,.9],[.3],[1,1.4,.3]],113) #per fare finestra
@@ -42,7 +37,6 @@ hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),CYAN,2)
 VIEW(hpc)
 DRAW(master)
-
 
 
 
