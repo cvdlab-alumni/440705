@@ -10,6 +10,8 @@ def mne (master,shape,sizePattern,toMerge):
     
     if x == 1 :
         x = y
+    elif z == 1:
+        z = y
     for i in range (x) :
         colonna = []
         for j in range (z) :

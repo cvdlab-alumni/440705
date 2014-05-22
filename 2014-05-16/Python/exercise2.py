@@ -3,6 +3,9 @@ from exercise3 import *
 
 DRAW = COMP([VIEW,STRUCT,MKPOLS])
 
+def ruotaSuz (points,a):
+    return [[x*COS(a)-y*SIN(a), x*SIN(a)+y*COS(a),z] for x,y,z in points]
+
 master = assemblyDiagramInit([11,9,2])([[.3,4,.1,4.5,.1,3,.1,5,.1,4,.3],
                                         [.3,1.5,.1,0.5,.1,2,0.1,3,.3],[.3,2.7]])
 V,CV = master
@@ -25,87 +28,71 @@ master = mne(master,[3,1,3],[[1.3,1.9,1.3],[.3],[1,1.4,.3]],55) #per fare finest
 master = mne(master,[3,1,2],[[1,1,2.5],[.3],[2,.7]],46) #per fare porta
 master = mne(master,[3,1,2],[[1.5,1,1.5],[.3],[2,.7]],24) #per fare porta
 
-hpc = SKEL_1(STRUCT(MKPOLS(master)))
-hpc = cellNumbering (master,hpc)(range(len(master[1])),CYAN,2)
-#VIEW(hpc)
-#DRAW(master)
-
-
 master = mne(master,[1,3,2],[[.3],[.5,1,.5],[2,.7]],63) #per fare porta
-master = mne(master,[1,5,3],[[.3],[.5,.9,.2,.9,.5],[1,1.4,.3]],15) #per fare finestra
-hpc = SKEL_1(STRUCT(MKPOLS(master)))
-hpc = cellNumbering (master,hpc)(range(len(master[1])),CYAN,2)
-VIEW(hpc)
-DRAW(master)
+
+#appartamento situato a NordOvest del palazzo
+appartamentoNO = master
+appartamentoNO = mne(appartamentoNO,[1,5,3],[[.3],[.5,.9,.2,.9,.5],[1,1.4,.3]],15) #per fare finestra
+DRAW(appartamentoNO)
+#appartamento situato a SudEst del palazzo
+V1,CV1 = appartamentoNO
+V1 = ruotaSuz(V1, PI)
+appartamentoSE = V1,CV1
+#appartamento situato a NordEst del palazzo
+appartamentoNE = master
+appartamentoNE = mne(appartamentoNE,[1,3,3],[[.3],[.6,.9,.5],[1,1.4,.3]],144) #per fare finestra
+#appartamento situato a SudOvest del palazzo
+V1,CV1 = appartamentoNE
+V1 = ruotaSuz(V1, PI)
+appartamentoSO = V1,CV1
 
 
 
 appartamento = master
-palazzo = assemblyDiagramInit([2,4,4])([[21.5,21.5],[2.5,7.9,4.5,7.9],[3,3,3,3]])
+palazzo = assemblyDiagramInit([2,3,7])([[21.5,21.5],[7.9,4.5,7.9],[3,.3,3,.3,3,.3,3]])
 V,CV = palazzo
-hpc = SKEL_1(STRUCT(MKPOLS(palazzo)))
-hpc = cellNumbering (palazzo,hpc)(range(len(CV)),CYAN,2)
-#VIEW(hpc)
-#DRAW(palazzo)
 
-palazzo = diagram2cell(appartamento,palazzo,5)
-palazzo = diagram2cell(appartamento,palazzo,5)
-palazzo = diagram2cell(appartamento,palazzo,5)
-palazzo = diagram2cell(appartamento,palazzo,10)
-palazzo = diagram2cell(appartamento,palazzo,10)
-palazzo = diagram2cell(appartamento,palazzo,10)
-palazzo = diagram2cell(appartamento,palazzo,15)
-palazzo = diagram2cell(appartamento,palazzo,15)
-palazzo = diagram2cell(appartamento,palazzo,15)
-palazzo = diagram2cell(appartamento,palazzo,20)
-palazzo = diagram2cell(appartamento,palazzo,20)
-palazzo = diagram2cell(appartamento,palazzo,20)
+palazzo = diagram2cell(appartamentoNE,palazzo,41)
+palazzo = diagram2cell(appartamentoNE,palazzo,39)
+palazzo = diagram2cell(appartamentoNE,palazzo,37)
+palazzo = diagram2cell(appartamentoSE,palazzo,27)
+palazzo = diagram2cell(appartamentoSE,palazzo,25)
+palazzo = diagram2cell(appartamentoSE,palazzo,23)
+palazzo = diagram2cell(appartamentoNO,palazzo,20)
+palazzo = diagram2cell(appartamentoNO,palazzo,18)
+palazzo = diagram2cell(appartamentoNO,palazzo,16)
+palazzo = diagram2cell(appartamentoSO,palazzo,6)
+palazzo = diagram2cell(appartamentoSO,palazzo,4)
+palazzo = diagram2cell(appartamentoSO,palazzo,2)
 
-hpc = SKEL_1(STRUCT(MKPOLS(palazzo)))
-hpc = cellNumbering (palazzo,hpc)(range(len(CV)),CYAN,2)
-VIEW(hpc)
 DRAW(palazzo)
 
-toRemoveCorridoio = [0,1,2,3,5,6,7,8,10,11,12,13,15,16,17,18]
+toRemoveCorridoio = [25,10]
 palazzo = palazzo[0], [cell for k,cell in enumerate(palazzo[1]) if not (k in toRemoveCorridoio)]
+DRAW(palazzo)
 
-#DRAW(palazzo)
+palazzo = mne(palazzo,[3,3,1],[[.5,4,17],[.45,7,.45],[.3]],23) #per fare buco per scale
+palazzo = mne(palazzo,[3,3,1],[[.5,4,17],[.45,7,.45],[.3]],21) #per fare buco per scale
+palazzo = mne(palazzo,[3,3,1],[[.5,4,17],[.45,7,.45],[.3]],19) #per fare buco per scale
+palazzo = mne(palazzo,[3,3,1],[[17,4,.5],[.45,7,.45],[.3]],9) #per fare buco per scale
+palazzo = mne(palazzo,[3,3,1],[[17,4,.5],[.45,7,.45],[.3]],7) #per fare buco per scale
+palazzo = mne(palazzo,[3,3,1],[[17,4,.5],[.45,7,.45],[.3]],5) #per fare buco per scale
+'''
+hpc = SKEL_1(STRUCT(MKPOLS(palazzo)))
+hpc = cellNumbering (palazzo,hpc)(range(len(palazzo[1])),CYAN,2)
+VIEW(hpc)
+'''
+toRemovePareti = [17,16,6,5]
+palazzo = palazzo[0], [cell for k,cell in enumerate(palazzo[1]) if not (k in toRemovePareti)]
 
-
-V = [[0,0],[0,22.8],[43,22.8],[43,0]]
-FV = [[0,1,2,3,0]]
-modelFaces = V,FV
-V0 = AA(LIST)([0.3,3.3,6.3,9.3])
-C0V = AA(LIST)(range(4))
-modelFloor = V0,C0V
-
-mod1D = larModelProduct([modelFaces,modelFloor])
-mod1D = COLOR([1,0.8,0]) (STRUCT(MKPOLS(mod1D)))
-
-VIEW(STRUCT([mod1D,hpc]))
 pal = COLOR([0.545,0.27,0])(STRUCT(MKPOLS(palazzo)))
-VIEW(STRUCT([mod1D,pal]))
-
-def spiralStair(width=0.2,R=1.,r=0.5,riser=0.1,pitch=2.,nturns=2.,steps=18):
-   V,CV = larSolidHelicoid(width,R,r,pitch,nturns,steps)()
-   W = CAT([[V[k],V[k+1],V[k+2],V[k+3]]+
-      [SUM([V[k+1],[0,0,-riser]]),SUM([V[k+3],[0,0,-riser]])]
-      for k,v in enumerate(V[:-4]) if k%4==0])
-   for k,w in enumerate(W[:-12]):
-      if k%6==0: W[k+1][2] = W[k+10][2]; W[k+3][2] = W[k+11][2]
-   nsteps = len(W)/12
-   CW =[SUM([[0,1,2,3,6,8,10,11],[6*k]*8]) for k in range(nsteps)]
-   return W,CW
+VIEW(pal)
 
 W,CW = spiralStair(0.6,2.1,0.6,0.2,3.8,5,18)
-
-def ruotaSuz (points,a):
-    return [[x*COS(a)-y*SIN(a), x*SIN(a)+y*COS(a),z] for x,y,z in points]
-
-W = ruotaSuz (W, PI/4)
-scale = T([1,2])([27.5,12.4])(STRUCT(MKPOLS([W,CW])))
-VIEW(STRUCT([mod1D,pal,scale]))
-
+scale1 = COLOR([1,0.8,0]) (T([1,2])([19,10])(STRUCT(MKPOLS([W,CW]))))
+W1 = ruotaSuz (W, 7*PI/6)
+scale2 = COLOR([1,0.8,0]) (T([1,2])([24,10])(STRUCT(MKPOLS([W1,CW]))))
+VIEW(STRUCT([pal,scale1,scale2]))
 
 
 print("attendere ...")
@@ -172,12 +159,12 @@ bezier4 = MAP( BEZIER(S2)([bezier1b,bezier2b]))(dom2D)
 
 curve3 = COLOR([0.5,1,0])( T([1,2])([24,7]) (STRUCT([bezier1,bezier2,bezier3,bezier4])))
 VIEW(STRUCT([curve3]))
-VIEW(STRUCT([tavolo,curve,curve2,curve3,hpc]))
+VIEW(STRUCT([tavolo,curve,curve2,curve3]))
 
 
-toRemoveParete = [2,0]
+toRemoveParete = [14,13,9,5,4,0]
 palazzo = palazzo[0], [cell for k,cell in enumerate(palazzo[1]) if not (k in toRemoveParete)]
 
 pal = COLOR([0.545,0.27,0])(STRUCT(MKPOLS(palazzo)))
-VIEW(STRUCT([tavolo,curve,curve2,curve3,pal]))
+VIEW(STRUCT([tavolo,curve,curve2,curve3,pal,scale1,scale2]))
 
