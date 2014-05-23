@@ -15,6 +15,17 @@ def ruotaSuz (points,a):
 def trasparenza(x):
     return MATERIAL([1,1,1,0.1, 0,0,0.8,0.5, 1,1,1,0.1, 1,1,1,0.1, 100])(x)
 
+def copieCircolari(x,angolo) :
+    a = angolo
+    cc = R([1,2])(a)(x)
+    s = STRUCT([x,cc])
+    a += angolo
+    while (a < 2*PI) :
+        cc = R([1,2])(a)(x)
+        s = STRUCT([s,cc])
+        a += angolo
+    return s
+
 master = assemblyDiagramInit([11,9,2])([[.3,4,.1,4.5,.1,3,.1,5,.1,4,.3],
                                         [.3,1.5,.1,0.5,.1,2,0.1,3,.3],[.3,2.7]])
 V,CV = master
@@ -100,14 +111,15 @@ VIEW(hpc)
 toRemovePareti = [17,16,6,5]
 palazzo = palazzo[0], [cell for k,cell in enumerate(palazzo[1]) if not (k in toRemovePareti)]
 
-pal = COLOR([0.545,0.27,0])(STRUCT(MKPOLS(palazzo)))
+pal = colorRGB(245,222,179)(STRUCT(MKPOLS(palazzo)))
 VIEW(pal)
 
 W,CW = spiralStair(0.6,2.1,0.6,0.2,3.8,5,18)
-scale1 = COLOR([1,0.8,0]) (T([1,2])([19,10])(STRUCT(MKPOLS([W,CW]))))
+scale1 = T([1,2])([19,10])(STRUCT(MKPOLS([W,CW])))
 W1 = ruotaSuz (W, 7*PI/6)
-scale2 = COLOR([1,0.8,0]) (T([1,2])([24,10])(STRUCT(MKPOLS([W1,CW]))))
-VIEW(STRUCT([pal,scale1,scale2]))
+scale2 = T([1,2])([24,10])(STRUCT(MKPOLS([W1,CW])))
+scale = colorRGB(147,147,147)(STRUCT([scale1,scale2]))
+VIEW(STRUCT([pal,scale]))
 
 
 dom1D = INTERVALS(1)(32)
@@ -131,7 +143,7 @@ bezier2 = MAP( BEZIER(S2)([bezier2a,bezier2b]))(dom2D)
 bezier3 = MAP( BEZIER(S2)([bezier1a,bezier2a]))(dom2D)
 bezier4 = MAP( BEZIER(S2)([bezier1b,bezier2b]))(dom2D)
 
-curve = COLOR([0,0.5,1])( T([1,2])([1,1]) (STRUCT([bezier1,bezier2,bezier3,bezier4])))
+curve = colorRGB(0,127,255)( T([1,2])([1,1]) (STRUCT([bezier1,bezier2,bezier3,bezier4])))
 portineria = T([1,2])([11,7])(R([1,2])(PI)(S([1,2,3])([.8,.8,.8])(STRUCT([tavolo,curve]))))
 VIEW(portineria)
 ''' curve non piu' mostrate
@@ -206,35 +218,18 @@ bezier1b = BEZIER(S1)(controls1b)
 bezier1 = MAP( BEZIER(S2)([bezier1a,bezier1b]))(dom2D)
 foglia = colorRGB(34,139,34)(bezier1)
 
-f2 = R([1,2])(PI/6)(foglia)
-f3 = R([1,2])(PI/6)(f2)
-f4 = R([1,2])(PI/6)(f3)
-f5 = R([1,2])(PI/6)(f4)
-f6 = R([1,2])(PI/6)(f5)
-f7 = R([1,2])(PI/6)(f6)
-f8 = R([1,2])(PI/6)(f7)
-f9 = R([1,2])(PI/6)(f8)
-f10 = R([1,2])(PI/6)(f9)
-f11 = R([1,2])(PI/6)(f10)
-f12 = R([1,2])(PI/6)(f11)
-
+foglie1 = copieCircolari(foglia,PI/6)
 
 controls1a = [[0,0,0], [-1,-1,.15], [-2,-2,.25], [-2.8,-3,.55]]
 bezier1a = BEZIER(S1)(controls1a)
 controls1b = [[-.85,.1,0], [-1.85,-.9,.15], [-2.5,-2.2,.25], [-2.8,-3,.55]]
 bezier1b = BEZIER(S1)(controls1b)
 bezier1 = MAP( BEZIER(S2)([bezier1a,bezier1b]))(dom2D)
-foglia2 = colorRGB(34,139,34)(bezier1)
+foglia2 = colorRGB(34,139,34) (R([1,2])(PI/4) (bezier1))
 
-ff2 = R([1,2])(PI/4)(foglia2)
-ff3 = R([1,2])(PI/3)(ff2)
-ff4 = R([1,2])(PI/3)(ff3)
-ff5 = R([1,2])(PI/3)(ff4)
-ff6 = R([1,2])(PI/3)(ff5)
-ff7 = R([1,2])(PI/3)(ff6)
+foglie2 = copieCircolari(foglia2,PI/3)
 
-foglie = T(3)(5.7)(STRUCT([foglia,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,ff2,ff3,ff4,ff5,ff6,ff7]))
-
+foglie = T(3)(5.7)(STRUCT([foglie1,foglie2]))
 pianta = STRUCT([vaso,tronco,foglie]) 
 VIEW(pianta)
 pianta = T([1,2])([2,8])(S([1,2,3])([.3,.3,.3])(pianta))
@@ -255,6 +250,6 @@ VIEW(ingresso)
 toRemoveParete = [5,4,0]
 palazzo = palazzo[0], [cell for k,cell in enumerate(palazzo[1]) if not (k in toRemoveParete)]
 
-pal = COLOR([0.545,0.27,0])(STRUCT(MKPOLS(palazzo)))
+pal = colorRGB(245,222,179)(STRUCT(MKPOLS(palazzo)))
 print("attendere ...")
-VIEW(STRUCT([pal,scale1,scale2,ingresso]))
+VIEW(STRUCT([pal,scale,ingresso]))
