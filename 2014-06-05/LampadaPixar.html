@@ -267,29 +267,29 @@
         });
 
         var gui3 = gui.addFolder('Other');
-        gui3.add(controls, 'OnOff').onChange(function (e) {
-          on_off_light(e);
-        });
         gui3.add(controls, 'Trackball').onChange(function (e) {
           trackballControls.enabled = e;
         });
-        gui3.add(controls, 'LampCamera').onChange(function (e) {
-          render_camera = e ? lamp_camera : camera;
-          trackballControls.enabled = !e && controls.Trackball;
-        });
-        gui3.add(controls, 'Reset').onChange(function (e) {
-          if (e) {
-            reset();
-          }
+        gui3.add(controls, 'OnOff').onChange(function (e) {
+          on_off_light(e);
         });
         gui3.add(controls, 'Animation').onChange(function (e) {
           if (e) {
             startAnimation();
           }
         });
+        gui3.add(controls, 'LampCamera').onChange(function (e) {
+          render_camera = e ? lamp_camera : camera;
+          trackballControls.enabled = !e && controls.Trackball;
+        });
         gui3.add(controls, 'Print').onChange(function (e) {
           if (e) {
             print();
+          }
+        });
+        gui3.add(controls, 'Reset').onChange(function (e) {
+          if (e) {
+            reset();
           }
         });
 
