@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+<head> 
+  <title>440705</title> 
+  <style>
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+
+  </style> 
+</head> 
+<body>
+  <!-- JavaScript libraries -->
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+  <script src="assets/libs/TrackballControls.js"></script>
+  <script src="assets/libs/keyframe.js"></script>
+  <script src="assets/libs/tween.min.js"></script> 
+  <script type="text/javascript" src="assets/fonts/bitstream_vera_sans_mono_roman.typeface.js"></script> 
+  <script>
+      // once everything is loaded, we run our Three.js stuff.
+      $(function () {
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+        var lamp_camera = new THREE.PerspectiveCamera(35, window.innerWidth/window.innerHeight, 0.1, 1000);
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColor(new THREE.Color(0xEEEEEE,1.0));
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        //per le ombre
+        renderer.shadowMapEnabled = true;
+
+        // position and point the camera to the center of the scene
+        camera.position.set(-50, 30, -40);
+        camera.up = new THREE.Vector3(0,1,0);
+        camera.lookAt(scene.position);
+
+        lamp_camera.position.set(0,0,0);
+        lamp_camera.up = new THREE.Vector3(0,1,0);
+        lamp_camera.lookAt(scene.position);
+
+        //per muovere la figura
+        var trackballControls = new THREE.TrackballControls(camera);
+
+        // add subtle ambient lighting
+        var ambiColor = "#0c0c0c";
+        var ambientLight = new THREE.AmbientLight(ambiColor);
+        scene.add(ambientLight);
+
+        var lightColor = "#ffffff";
+        var directionalLight = new THREE.DirectionalLight(lightColor);
+        directionalLight.position.set(0, 100, 0);
+        directionalLight.intensity = .8;
+        scene.add(directionalLight);
+
+        var axisHelper = new THREE.AxisHelper(20);
+        //scene.add(axisHelper);
+
+
+        // create the ground plane
+        var planeX = 100;
+        var planeY = 100;
+        var planeGeometry = new THREE.PlaneGeometry(planeX,planeY,100,100);
+        var planeMaterial =  new THREE.MeshLambertMaterial({color: 0xABCDEF, side: THREE.DoubleSide});
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.rotation.x = -Math.PI/2;
+        //per le ombre
+        plane.receiveShadow = true;
+
+
+        // add the plane to the scene
+        scene.add(plane);
+
+        function mkJoint (radius, height) {
+          var joint = new THREE.Object3D();
+          var sphereGeometry = new THREE.SphereGeometry(radius, 80, 80);
+          var sphereMaterial = new THREE.MeshPhongMaterial({color: 0x8F8F8F});
+          var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+          //per le ombre
+          sphere.castShadow = true;
+          joint.add(sphere);
+
+          var cylinderGeometry = new THREE.CylinderGeometry(radius/3, radius/3, height, 32);
+          var cylinderMaterial = new THREE.MeshPhongMaterial({color: 0xB2B2B2});
+          var cylinder1 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+          cylinder1.position.set(-2*radius/3, height / 2 + radius, 0);
+          //per le ombre
+          cylinder1.castShadow = true;
+          sphere.add(cylinder1);
+          
+          var cylinder2 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+          cylinder2.position.set(2*radius/3, height / 2 + radius, 0);
+          cylinder2.castShadow = true;
+          sphere.add(cylinder2);
+
+          var hook = new THREE.Object3D();
+          hook.position.set(2*radius/3, height/2 + radius, 0);
+          cylinder1.add(hook);
+
+          joint.sphere = sphere;
+          joint.cylinder1 = cylinder1;
+          joint.cylinder2 = cylinder2;
+          joint.hook = hook;
+
+          return joint;
+        }
+
+        //base
+        var height_base= .5;
+        var radius_base = 8.5;
+        var geometry = new THREE.CylinderGeometry( radius_base , radius_base , height_base, 32 );
+        var material = new THREE.MeshPhongMaterial( {color: 0xB2B2B2} );
+        var base = new THREE.Mesh( geometry, material );
+        base.position.y = height_base/2;
+        //per le ombre
+        base.castShadow = true;
+        scene.add(base);
+
+        //primo braccio
+        var radius_arm = 1;
+        var height_arm = 8.5;
+        var arm1 = mkJoint(radius_arm,radius_base);
+        arm1.position.y = radius_arm + height_base/2;
+        base.add(arm1);
+
+        var initial_rotation_beta = Math.PI/8;
+        arm1.sphere.rotation.x = initial_rotation_beta;
+
+
+        //secondo braccio
+        var arm2 = mkJoint(radius_arm,radius_base);
+        arm1.hook.add(arm2);
+
+        var initial_rotation_gamma = Math.PI;
+        arm2.rotation.y = initial_rotation_gamma; 
+        var initial_rotation_delta = Math.PI/4;
+        arm2.sphere.rotation.x = initial_rotation_delta;
+
+
+        //ultima sferetta
+        var sphereGeometry = new THREE.SphereGeometry(radius_arm, 80, 80);
+        var sphereMaterial = new THREE.MeshPhongMaterial({color: 0x8F8F8F});
+        var sphere_end = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        arm2.hook.add(sphere_end);
+
+        var initial_rotation_epsilon = Math.PI/8;
+        sphere_end.rotation.x = initial_rotation_epsilon;
+
+
+        //lampada
+        var radius_lamp = 4.5;
+        var sphereGeometry = new THREE.SphereGeometry(radius_lamp, 80, 80, 0 , Math.PI, 0, Math.PI);
+        var sphereMaterial = new THREE.MeshPhongMaterial({color: 0x8F8F8F, side: THREE.DoubleSide});
+        var lamp = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        lamp.position.y = radius_lamp + radius_arm/2;
+        sphere_end.add(lamp);
+        lamp.rotation.y = Math.PI; 
+
+
+        //lampadina
+        var radius_bulb = 1.5;
+        var bulbGeometry = new THREE.SphereGeometry(radius_bulb, 80, 80);
+        var bulbMaterial = new THREE.MeshBasicMaterial({color: 0xFFFFFF, opacity:0.95, transparent:true});
+        var bulb = new THREE.Mesh(bulbGeometry, bulbMaterial);
+        lamp.add(bulb);
+        lamp.add(lamp_camera);
+
+
+        //luce
+        var target = new THREE.Object3D();
+        target.position.z = -75;
+
+        var pointColor = "#ffffff";
+        var spotLight = new THREE.SpotLight(pointColor);
+        spotLight.target = target;
+        spotLight.distance = 50;
+        spotLight.angle = 0.75;
+        spotLight.exponent = 30;
+        spotLight.intensity = 5;
+        //per le ombre
+        spotLight.castShadow = true;
+        spotLight.shadowMapWidth = 1024;
+        spotLight.shadowMapHeight = 1024;
+        spotLight.shadowCameraNear = 0.1;
+        spotLight.shadowCameraFar = 4000;
+        spotLight.shadowCameraFov = 30;
+        //spotLight.shadowCameraVisible = true;
+        spotLight.add(target);
+        bulb.add(spotLight);
+
+
+        //oggetto
+        var torus = new THREE.TorusGeometry( 3, 1.5, 16, 100 );
+        var material = new THREE.MeshPhongMaterial( { color: 0x000080, metal: true } );
+        var torus = new THREE.Mesh(torus, material );
+        torus.position.set(0,4.5,-28);
+        torus.castShadow = true;
+
+        scene.add(torus);
+
+        var text = null;
+
+        function on_off_light(onOff) {
+          if (onOff) {
+            bulbMaterial.color = new THREE.Color(0xFFFFFF);
+            spotLight.intensity = 5;
+            spotLight.shadowDarkness = 0.5;
+          }
+          else {
+            bulbMaterial.color = new THREE.Color(0xA0A0A0);
+            spotLight.intensity = 0;
+            spotLight.shadowDarkness = 0;
+          }
+        }
+        
+        var controls = new function () {
+          this.traslaX = 0.0;
+          this.traslaZ = 0.0;
+          this.alpha = 0.0;
+          this.beta = initial_rotation_beta;
+          this.gamma = initial_rotation_gamma;
+          this.delta = initial_rotation_delta;
+          this.epsilon = initial_rotation_epsilon;
+          this.OnOff = true;
+          this.Trackball = true;
+          this.LampCamera = false;
+          this.Reset = false;
+          this.Animation = false;
+          this.Print = false;
+        };
+
+        var render_camera = camera;
+
+        var gui = new dat.GUI();
+        
+        var gui1 = gui.addFolder('Move');
+        gui1.add(controls, 'traslaX', -planeX/2 + radius_base, planeX/2 - radius_base).onChange(function (value) {
+          base.position.x = value; 
+        });
+
+        gui1.add(controls, 'traslaZ', -planeY/2 + radius_base, planeY/2 - radius_base).onChange(function (value) {
+          base.position.z = value; 
+        });
+
+        var gui2 = gui.addFolder('Move arm');
+        gui2.add(controls, 'alpha', 0.0, 2*Math.PI).onChange(function (value) {
+          arm1.rotation.y = value; 
+        });
+        gui2.add(controls, 'beta', 0.0, Math.PI/2).onChange(function (value) {
+          arm1.sphere.rotation.x = value; 
+        });
+        gui2.add(controls, 'gamma', 0.0, 2*Math.PI).onChange(function (value) {
+          arm2.rotation.y = value; 
+        });
+        gui2.add(controls, 'delta', 0.0, Math.PI/2).onChange(function (value) {
+          arm2.sphere.rotation.x = value; 
+        });
+        gui2.add(controls, 'epsilon', 0.0, Math.PI/2).onChange(function (value) {
+          sphere_end.rotation.x = value; 
+        });
+
+        var gui3 = gui.addFolder('Other');
+        gui3.add(controls, 'OnOff').onChange(function (e) {
+          on_off_light(e);
+        });
+        gui3.add(controls, 'Trackball').onChange(function (e) {
+          trackballControls.enabled = e;
+        });
+        gui3.add(controls, 'LampCamera').onChange(function (e) {
+          render_camera = e ? lamp_camera : camera;
+          trackballControls.enabled = !e && controls.Trackball;
+        });
+        gui3.add(controls, 'Reset').onChange(function (e) {
+          if (e) {
+            reset();
+          }
+        });
+        gui3.add(controls, 'Animation').onChange(function (e) {
+          if (e) {
+            startAnimation();
+          }
+        });
+        gui3.add(controls, 'Print').onChange(function (e) {
+          if (e) {
+            print();
+          }
+        });
+
+
+        function reset() {
+
+          base.position.x = 0.0;
+          base.position.z = 0.0;
+          base.position.y = height_base/2;
+          arm1.rotation.y = 0.0;
+          arm1.sphere.rotation.x = initial_rotation_beta;
+          arm2.rotation.y = initial_rotation_gamma;
+          arm2.sphere.rotation.x = initial_rotation_delta;
+          sphere_end.rotation.x = initial_rotation_epsilon;
+          on_off_light(true);
+          render_camera = camera;
+
+          camera.position.set(-50, 30, -40);
+          camera.up = new THREE.Vector3(0,1,0);
+          camera.lookAt(scene.position);
+
+          torus.scale.y = 1;
+          torus.position.set(0,4.5,-28);
+
+          if(text !== null)
+            scene.remove(text);
+        }
+
+        function createText(){
+
+          var options = {
+            size : 10,
+            height : 5,
+            bevelThickness : 0.1,
+            bevelSize : 0.1,
+            bevelEnabled : true,
+            bevelSegments : 4,
+            bevelEnabled : true,
+            curveSegments : 4,
+            font : "bitstream vera sans mono",
+            weight : "normal",  
+          };
+
+          text = new THREE.Object3D();
+          text.rotation.y = Math.PI;
+          text.position.set(50,200,-22);
+
+          var meshMaterial = new THREE.MeshPhongMaterial({specular: 0xffffff, color: 0xC0C0C0, shininess: 100});
+          
+          function createCharacter(character) {
+            var obj = new THREE.Object3D();
+
+            var chara = THREE.SceneUtils.createMultiMaterialObject(new THREE.TextGeometry(character, options), [meshMaterial]);
+            chara.castShadow = true;
+            obj.add(chara);
+            var hook = new THREE.Object3D();
+            hook.position.x = 8;
+            chara.add(hook);
+            obj.hook = hook;
+            return obj;
+          }
+
+          text1 = createCharacter("C");
+          text.add(text1);
+          text2 = createCharacter("v");
+          text1.hook.add(text2);
+          text3 = createCharacter("d");
+          text2.hook.add(text3);
+          text4 = createCharacter("l");
+          text3.hook.add(text4);
+          text5 = createCharacter("a");
+          text4.hook.add(text5);
+          text6 = createCharacter("b");
+          text5.hook.add(text6);
+
+          scene.add(text);
+        }
+
+
+
+        var animator = null;
+        var duration = 3; // sec
+        var loopAnimation = false;
+
+        function startAnimation() {
+          reset();
+          gui.closed = true;
+
+          createText();
+
+          camera.position.set(-80, 70, -120);
+          camera.up = new THREE.Vector3(0,1,0);
+          camera.lookAt(scene.position);
+          trackballControls.enabled = false;
+
+
+          var lampTween = new TWEEN.Tween(arm1.rotation)
+          .to({ y : Math.PI/2}, 200)
+          // .easing(TWEEN.Easing.Linear.None)
+          .easing(TWEEN.Easing.Quadratic.In) 
+          .start();
+
+
+          function initAnimator() {
+            var time_animation1 = 400;
+            var time_animation2 = time_animation1+600;
+            var time_animation3 = time_animation2 + 500;
+            var time_animation4 = time_animation3 + 900;
+            var time_animation5 = time_animation4 + 150;
+            var time_tot = time_animation5;
+            animator = new KF.KeyFrameAnimator;
+            animator.init({ 
+              interps:
+              [
+              { 
+                keys:[.25*time_animation1/time_tot , .37*time_animation1/time_tot, .56*time_animation1/time_tot, .74*time_animation1/time_tot, 1*time_animation1/time_tot], 
+                values:[
+                { x : 0,  y : 0 },
+                { x : -10,  y : 7.2 },
+                { x : -20,  y : 12 },
+                { x : -30,  y : 7.2 },
+                { x : -40,  y : 0 }
+                ],
+                target:base.position
+              },
+              { 
+                keys:[.66*time_animation2/time_tot,.82*time_animation2/time_tot, .98*time_animation2/time_tot], 
+                values:[
+                { x : initial_rotation_epsilon},
+                { x : 0 },
+                { x : initial_rotation_epsilon}
+                ],
+                target:sphere_end.rotation
+              },
+              { 
+                keys:[.67*time_animation2/time_tot,.83*time_animation2/time_tot, .99*time_animation2/time_tot], 
+                values:[
+                { x : initial_rotation_delta},
+                { x : Math.PI/6 },
+                { x : initial_rotation_delta}
+                ],
+                target:arm2.sphere.rotation
+              },
+              { 
+                keys:[.68*time_animation2/time_tot,.84*time_animation2/time_tot, 1*time_animation2/time_tot], 
+                values:[
+                { y : Math.PI/2},
+                { y : 0 },
+                { y : Math.PI/2}
+                ],
+                target:arm1.rotation
+              },
+              { 
+                keys:[.75*time_animation2/time_tot, .80*time_animation2/time_tot, .85*time_animation2/time_tot], 
+                values:[
+                { color : new THREE.Color(0xFFFFFF)},
+                { color : new THREE.Color(0xA0A0A0)},
+                { color : new THREE.Color(0xFFFFFF)}
+                ],
+                target:bulbMaterial
+              },
+              { 
+                keys:[.75*time_animation2/time_tot, .80*time_animation2/time_tot, .85*time_animation2/time_tot], 
+                values:[
+                { intensity : 5},
+                { intensity : 0},
+                { intensity : 5}
+                ],
+                target:spotLight
+              },
+              { 
+                keys:[.73*time_animation3/time_tot, .98*time_animation3/time_tot, 1*time_animation3/time_tot], 
+                values:[
+                { y : 200  },
+                { y : 4.5},
+                { y : 0}
+                ],
+                target:text.position
+              },
+              { 
+                keys:[.98*time_animation3/time_tot, 1*time_animation3/time_tot], 
+                values:[
+                { y : 1 },
+                { y : 0.5}
+                ],
+                target:torus.scale
+              },
+              { 
+                keys:[.98*time_animation3/time_tot, 1*time_animation3/time_tot], 
+                values:[
+                { y : 4.5, x:0 },
+                { y : 2.25, x:-10}
+                ],
+                target:torus.position
+              },
+              { 
+                keys:[.98*time_animation3/time_tot, 1*time_animation3/time_tot], 
+                values:[
+                { x : initial_rotation_beta },
+                { x : Math.PI/2}
+                ],
+                target:arm1.sphere.rotation
+              },
+              { 
+                keys:[.98*time_animation3/time_tot, 1*time_animation3/time_tot], 
+                values:[
+                { y : initial_rotation_gamma },
+                { y : 4*Math.PI/3}
+                ],
+                target:arm2.rotation
+              },
+              { 
+                keys:[.98*time_animation3/time_tot, 1*time_animation3/time_tot], 
+                values:[
+                { color : new THREE.Color(0xFFFFFF)},
+                { color : new THREE.Color(0xA0A0A0)}
+                ],
+                target:bulbMaterial
+              },
+              { 
+                keys:[.98*time_animation3/time_tot, 1*time_animation3/time_tot], 
+                values:[
+                { intensity : 5},
+                { intensity : 0}
+                ],
+                target:spotLight
+              },
+              
+              { 
+                keys:[.8*time_animation4/time_tot, 1*time_animation4/time_tot], 
+                values:[
+                { x : Math.PI/2},
+                { x : initial_rotation_beta }                
+                ],
+                target:arm1.sphere.rotation
+              },
+              { 
+                keys:[.8*time_animation4/time_tot, 1*time_animation4/time_tot], 
+                values:[
+                { y : 4*Math.PI/3},
+                { y : initial_rotation_gamma }                
+                ],
+                target:arm2.rotation
+              },
+              { 
+                keys:[.9*time_animation4/time_tot, 1*time_animation4/time_tot], 
+                values:[
+                { y : Math.PI/2},
+                { y : 0 }                
+                ],
+                target:arm1.rotation
+              },
+              
+              { 
+                keys:[.9*time_animation4/time_tot, .9*time_animation4/time_tot], 
+                values:[
+                { color : new THREE.Color(0xA0A0A0)},
+                { color : new THREE.Color(0xFFFFFF)}
+                ],
+                target:bulbMaterial
+              },
+              { 
+                keys:[.9*time_animation4/time_tot, .98*time_animation4/time_tot], 
+                values:[
+                { intensity : 0},
+                { intensity : 5}
+                ],
+                target:spotLight
+              },
+              { 
+                keys:[.55*time_animation5/time_tot, 1*time_animation5/time_tot], 
+                values:[
+                { x:-80, y:70, z:-120},
+                { x:0, y:30, z:-120}
+                ],
+                target:camera.position
+              },
+              ],
+              loop: loopAnimation,
+              duration: duration * time_tot
+            });
+
+            
+          }
+
+          initAnimator();
+          animator.start();
+
+        }
+
+      //initAnimator();
+
+
+      // add the output of the renderer to the html element
+      $('body').append(renderer.domElement);
+      render();
+      //animator.start();
+
+
+      function render() {
+          //per muovere la figura
+          trackballControls.update();
+
+          TWEEN.update();
+          KF.update();
+
+          // render using requestAnimationFrame
+          requestAnimationFrame(render);
+          renderer.render(scene, render_camera);
+        }
+
+
+
+      });
+</script>
+</body>
+</html>
