@@ -20,6 +20,9 @@
   <script src="assets/libs/keyframe.js"></script>
   <script src="assets/libs/tween.min.js"></script> 
   <script type="text/javascript" src="assets/fonts/bitstream_vera_sans_mono_roman.typeface.js"></script> 
+    <script type="text/javascript" src="assets/fonts/helvetiker_regular.typeface.js"></script> 
+  <script type="text/javascript" src="assets/fonts/helvetiker_bold.typeface.js"></script> 
+  <script type="text/javascript" src="assets/fonts/bitstream_vera_sans_mono_roman.typeface.js"></script> 
   <script>
       // once everything is loaded, we run our Three.js stuff.
       $(function () {
@@ -331,36 +334,14 @@
           };
 
           text = new THREE.Object3D();
-          text.rotation.y = Math.PI;
+          var material = new THREE.MeshPhongMaterial({color: 0xC0C0C0, shininess: 100, metal: true, specular: 0xffffff});
+          var textGeom = new THREE.TextGeometry('CVDlab',options);
+          var text1 = new THREE.Mesh( textGeom, material );
+          text1.castShadow = true;
+          text1.rotation.y = Math.PI;
           text.position.set(50,200,-22);
 
-          var meshMaterial = new THREE.MeshPhongMaterial({specular: 0xffffff, color: 0xC0C0C0, shininess: 100});
-          
-          function createCharacter(character) {
-            var obj = new THREE.Object3D();
-
-            var chara = THREE.SceneUtils.createMultiMaterialObject(new THREE.TextGeometry(character, options), [meshMaterial]);
-            chara.castShadow = true;
-            obj.add(chara);
-            var hook = new THREE.Object3D();
-            hook.position.x = 8;
-            chara.add(hook);
-            obj.hook = hook;
-            return obj;
-          }
-
-          text1 = createCharacter("C");
           text.add(text1);
-          text2 = createCharacter("v");
-          text1.hook.add(text2);
-          text3 = createCharacter("d");
-          text2.hook.add(text3);
-          text4 = createCharacter("l");
-          text3.hook.add(text4);
-          text5 = createCharacter("a");
-          text4.hook.add(text5);
-          text6 = createCharacter("b");
-          text5.hook.add(text6);
 
           scene.add(text);
         }
@@ -396,7 +377,8 @@
             var time_animation3 = time_animation2 + 500;
             var time_animation4 = time_animation3 + 900;
             var time_animation5 = time_animation4 + 150;
-            var time_tot = time_animation5;
+            var time_animation6 = time_animation5 + 450;
+            var time_tot = time_animation6;
             animator = new KF.KeyFrameAnimator;
             animator.init({ 
               interps:
@@ -549,7 +531,7 @@
                 target:bulbMaterial
               },
               { 
-                keys:[.9*time_animation4/time_tot, .98*time_animation4/time_tot], 
+                keys:[.9*time_animation5/time_tot, .98*time_animation5/time_tot], 
                 values:[
                 { intensity : 0},
                 { intensity : 5}
@@ -563,6 +545,15 @@
                 { x:0, y:30, z:-120}
                 ],
                 target:camera.position
+              },
+              { 
+                keys:[.86*time_animation6/time_tot, .95*time_animation6/time_tot, 1*time_animation6/time_tot], 
+                values:[
+                { x:-40},
+                { x: 40},
+                { x: 20}
+                ],
+                target:base.position
               },
               ],
               loop: loopAnimation,
